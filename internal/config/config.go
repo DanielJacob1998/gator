@@ -7,15 +7,16 @@ import (
 )
 
 const configFileName = ".gatorconfig.json"
+const defaultDBURL = "postgres://danielmariathasan@localhost:5432/gator?sslmode=disable"
 
 type Config struct {
-    DBURL           string `json:"db_url"`
-    CurrentUserName string `json:"current_user_name"`
+    CurrentUserName string    `json:"current_user"`
+    DatabaseURL     string    `json:"database_url"`
 }
 
-func (cfg *Config) SetUser(userName string) error {
-    cfg.CurrentUserName = userName
-    return write(*cfg)
+func (cfg *Config) SetUser(username string) error {
+    cfg.CurrentUserName = username
+    return Write(*cfg)
 }
 
 func Read() (Config, error) {
@@ -25,7 +26,15 @@ func Read() (Config, error) {
     }
 
     file, err := os.Open(fullPath)
-    if err != nil {
+    if os.IsNotExist(err) {
+        // File doesn't exist, create new config with defaults
+        cfg := New()
+        err = Write(cfg)
+        if err != nil {
+            return Config{}, err
+        }
+        return cfg, nil
+    } else if err != nil {
         return Config{}, err
     }
     defer file.Close()
@@ -49,7 +58,7 @@ func getConfigFilePath() (string, error) {
     return fullPath, nil
 }
 
-func write(cfg Config) error {
+func Write(cfg Config) error {
     fullPath, err := getConfigFilePath()
     if err != nil {
         return err
@@ -70,3 +79,8 @@ func write(cfg Config) error {
     return nil
 }
 
+func New() Config {
+    return Config{
+        DatabaseURL: defaultDBURL,
+    }
+}
