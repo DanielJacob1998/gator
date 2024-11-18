@@ -10,8 +10,8 @@ const configFileName = ".gatorconfig.json"
 const defaultDBURL = "postgres://danielmariathasan@localhost:5432/gator?sslmode=disable"
 
 type Config struct {
-    CurrentUserName string    `json:"current_user"`
-    DatabaseURL     string    `json:"database_url"`
+    CurrentUserName string `json:"current_user_name"`
+    DatabaseURL     string `json:"database_url"`
 }
 
 func (cfg *Config) SetUser(username string) error {
