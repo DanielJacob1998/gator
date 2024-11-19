@@ -48,11 +48,14 @@ func main() {
     cmds.register("login", handlerLogin)
     cmds.register("register", handlerRegister)
     cmds.register("users", usersHandler)
-    cmds.register("reset", func(s *state, c command) error {
-        // Adapt the handler to conform with the existing command signature
-        handlerReset(ctx, *s)
-        return nil
-    })
+    cmds.register("addfeed", middlewareLoggedIn(handlerAddFeed))
+    cmds.register("agg", handleAgg)
+    cmds.register("follow", middlewareLoggedIn(handleFollow))
+    cmds.register("following", middlewareLoggedIn(followingCommand))
+    cmds.register("feeds", feedsHandler)
+    cmds.register("unfollow", middlewareLoggedIn(handlerUnfollow))
+    cmds.register("browse", middlewareLoggedIn(handlerBrowse))
+    cmds.register("reset", handlerReset)
 
     cmdName := os.Args[1]
     cmdArgs := os.Args[2:]
